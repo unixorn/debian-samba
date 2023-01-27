@@ -52,6 +52,11 @@ generic() { local section="$1" key="$(sed 's| *=.*||' <<< $2)" \
     fi
 }
 
+# Set the netbios ame
+netbios-name() {
+    global "netbios name = $1"
+}
+
 ### global: set a global config option
 # Arguments:
 #   option) raw option
@@ -256,6 +261,7 @@ while getopts ":hc:G:g:i:nprs:Su:Ww:I:" opt; do
         g) global "$OPTARG" ;;
         i) import "$OPTARG" ;;
         n) NMBD="true" ;;
+        N) netbios-name "$OPTARG" ;;
         p) PERMISSIONS="true" ;;
         r) recycle ;;
         s) eval share $(sed 's/^/"/; s/$/"/; s/;/" "/g' <<< $OPTARG) ;;
@@ -286,6 +292,7 @@ done < <(env | awk '/^SHARE[0-9=_]/ {sub (/^[^=]*=/, "", $0); print}')
 while read i; do
     eval user $(sed 's/^/"/; s/$/"/; s/;/" "/g' <<< $i)
 done < <(env | awk '/^USER[0-9=_]/ {sub (/^[^=]*=/, "", $0); print}')
+[[ "${NETBIOS_NAME:-""}" ]] && netbios-name "$NETBIOS_NAME"
 [[ "${WORKGROUP:-""}" ]] && workgroup "$WORKGROUP"
 [[ "${WIDELINKS:-""}" ]] && widelinks
 [[ "${INCLUDE:-""}" ]] && include "$INCLUDE"
