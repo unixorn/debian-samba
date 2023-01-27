@@ -99,19 +99,20 @@ ENVIRONMENT VARIABLES
  * `CHARMAP` - As above, configure character mapping
  * `GENERIC` - As above, configure a generic section option (See NOTE3 below)
  * `GLOBAL` - As above, configure a global option (See NOTE3 below)
+ * `GROUPID` - Set the GID for the samba server's default user (smbuser)
  * `IMPORT` - As above, import a smbpassword file
+ * `INCLUDE` - As above, add a smb.conf include
+ * `NETBIOS_NAME` - As above, set the server's netbios name
  * `NMBD` - As above, enable nmbd
  * `PERMISSIONS` - As above, set file permissions on all shares
  * `RECYCLE` - As above, disable recycle bin
  * `SHARE` - As above, setup a share (See NOTE3 below)
  * `SMB` - As above, disable SMB2 minimum version
  * `TZ` - Set a timezone, IE `EST5EDT`
+ * `USERID` - Set the UID for the samba server's default user (smbuser)
  * `USER` - As above, setup a user (See NOTE3 below)
  * `WIDELINKS` - As above, allow access wide symbolic links
  * `WORKGROUP` - As above, set workgroup
- * `USERID` - Set the UID for the samba server's default user (smbuser)
- * `GROUPID` - Set the GID for the samba server's default user (smbuser)
- * `INCLUDE` - As above, add a smb.conf include
 
 **NOTE**: if you enable nmbd (via `-n` or the `NMBD` environment variable), you
 will also want to expose port 137 and 138 with `-p 137:137/udp -p 138:138/udp`.
@@ -172,15 +173,17 @@ services:
     volumes:
       - /mnt:/mnt:z
       - /mnt2:/mnt2:z
-    command: '-s "Mount;/mnt" -s "Bobs Volume;/mnt2;yes;no;no;bob" -u "bob;bobspasswd" -p'
+    command: '-N "SERVERNAME" -s "Mount;/mnt" -s "Bobs Volume;/mnt2;yes;no;no;bob" -u "bob;bobspasswd" -p'
 
 networks:
   default:
 ```
 
-Add `-g 'force user = ""'` to the `command` key to make the files shared by samba have individual UIDs instead of all sharing the same user. This will keep permissions outside the container working the same as permissions inside the container.
+Add `-g 'force user = ""'` to the `command` key (and remove the `-p`) to make the files shared by samba have individual UIDs instead of all sharing the same user. This will keep permissions outside the container working the same as permissions inside the container.
 
 You'll also have to set the userid in the `-u` commands. Adding `-u "username2;password2;1234;groupname;5678"` will set `username2` to have uid 1234, be a member of group `groupname`, and set `groupname`'s gid to 5678.
+
+Add `-N "SERVERNAME"` to set the server name so you can refer to it as `smb://SERVERNAME`
 
 ## User Feedback
 
