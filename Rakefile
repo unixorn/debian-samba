@@ -4,7 +4,7 @@ task :build => [:multiarch_build]
 task :buildx => [:multiarch_build]
 task :b => [:multiarch_build]
 
-CONTAINER_NAME = 'unixorn/deban-samba'
+CONTAINER_NAME = 'unixorn/debian-samba'
 IMAGE_VERSION = `date +%Y-%m-%d-%H%M`.strip()
 
 task :usage do
