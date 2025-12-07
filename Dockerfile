@@ -1,13 +1,13 @@
-FROM debian:11-slim
+FROM debian:13-slim
 LABEL org.opencontainers.image.authors="Joe Block <jpb@unixorn.net>"
-LABEL description="Samba on debian bullseye-slim"
+LABEL description="Samba on debian 13-slim"
 
 EXPOSE 137/udp 138/udp
 EXPOSE 139 445
 
 RUN apt-get update && \
     apt-get upgrade -y --no-install-recommends && \
-    apt-get install -y apt-utils ca-certificates tzdata tini \
+    apt-get install -y apt-utils ca-certificates tzdata tini adduser \
       --no-install-recommends && \
 		update-ca-certificates && \
     apt-get install -y --no-install-recommends samba smbclient samba-vfs-modules && \
