@@ -17,13 +17,32 @@ end
 
 # Tasks
 desc 'Use buildx to make a multi-arch container'
-task :multiarch_build do
+task :multiarch_build => [:multiarch_build_debian_13, :multiarch_build_latest,] do
+  # You can't build and load in the same command, so pull the arch we're running on- at least it'll be in cache
+  sh %{ docker pull #{CONTAINER_NAME} }
+end
+
+desc 'Build and tag with date'
+task :multiarch_build_date_tag do
   puts "Building #{CONTAINER_NAME}"
   # Build on all supported architectures
   sh %{ docker buildx build --platform linux/amd64,linux/arm/v7,linux/arm64 --push -t "#{CONTAINER_NAME}:#{IMAGE_VERSION}" .}
-  # You can't build and load in the same command, so pull the arch we're running on- at least it'll be in cache
   sh %{ docker pull #{CONTAINER_NAME}:#{IMAGE_VERSION} }
-  sh %{ docker pull #{CONTAINER_NAME} }
+end
+
+desc 'Build and tag as debian-13'
+task :multiarch_build_debian_13 => :multiarch_build_date_tag do
+  puts "Building #{CONTAINER_NAME}"
+  # Build on all supported architectures
+  sh %{ docker buildx build --platform linux/amd64,linux/arm/v7,linux/arm64 --push -t "#{CONTAINER_NAME}:debian-13" .}
+  sh %{ docker pull #{CONTAINER_NAME}:debian-13 }
+end
+
+desc 'Build and tag as latest'
+task :multiarch_build_latest => :multiarch_build_debian_13 do
+  puts "Building #{CONTAINER_NAME}"
+  # Build on all supported architectures
+  sh %{ docker buildx build --platform linux/amd64,linux/arm/v7,linux/arm64 --push -t "#{CONTAINER_NAME}:latest" .}
 end
 
 # Only need the arch we're running on when doing tests
